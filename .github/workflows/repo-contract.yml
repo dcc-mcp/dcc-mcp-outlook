@@ -1,0 +1,28 @@
+name: Repo contract
+
+# Adopts the org-wide repository contract (PIP-3741) by calling the reusable
+# workflow in dcc-mcp/.github. The rules and their severities live in
+# contract/repo_contract.json, so this file only selects the profile.
+#
+# dcc-mcp-outlook is a placeholder repository with no package to build or test,
+# so this gate is the machine-checkable half of its CI evidence: no build
+# artifacts at the root, an AGENTS.md, and a root directory limited to the
+# org allowlist.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    uses: dcc-mcp/.github/.github/workflows/repo-contract.yml@main
+    with:
+      profile: baseline
